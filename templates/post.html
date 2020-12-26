@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <h1>{{ post.title }}</h1>
+
+    <h2>{{ post.subtitle }}</h2>
+
+    <span class="meta">Posted By
+        <a href="#">{{ post.author }}</a>
+        on {{ post.date_posted.strftime('%b %d, %Y') }}
+    </span>
+
+    <!-- Post Content -->
+
+    <article>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-md-10 mx-auto">
+                    <p>
+                        {{ post.content | safe}}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </article>
+
+
+    
+{% endblock content %}

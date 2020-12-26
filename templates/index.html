@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+{% block content %}
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="row">
+            <div class="col-log-8 col-md-10 mx-auto">
+                {% for post in posts %}
+                <div class="post-preview">
+                    <a href={{ "/post/" + post.slug }}>
+                        <h2 class="post-title">
+                            {{ post.title }}
+                        </h2>
+                        <h3 class="post-subtitle">
+                            {{ post.subtitle }}
+                        </h3>
+                    </a>
+                    <p class="post-meta">
+                        Posted by
+                        <a href="#">{{ post.author }}</a>
+                        on {{ post.date_posted.strftime('%b %d, %Y') }}
+                    </p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+   
+    <!-- <div class="posts"> -->
+    
+{% endblock content %}
