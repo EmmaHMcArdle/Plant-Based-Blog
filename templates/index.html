@@ -11,9 +11,9 @@
                         <h2 class="post-title">
                             {{ post.title }}
                         </h2>
-                        <h3 class="post-subtitle">
+                        <h4 class="post-subtitle">
                             {{ post.subtitle }}
-                        </h3>
+                        </h4>
                     </a>
                     <p class="post-meta">
                         Posted by
@@ -21,7 +21,12 @@
                         on {{ post.date_posted.strftime('%b %d, %Y') }}
                     </p>
                 </div>
+                <hr>
                 {% endfor %}
+                <!-- Pager -->
+                <div class="clearfix">
+                    <a class="btn btn-primary float-right" href="#">Older Posts &rarr;</a>
+                </div>
             </div>
         </div>
     </div>

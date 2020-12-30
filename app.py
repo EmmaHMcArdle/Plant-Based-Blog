@@ -1,17 +1,26 @@
-from flask import Flask, render_template, url_for, abort
+from flask import Flask, render_template, url_for, abort, session, redirect, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 import sqlalchemy
+from flask_mail import Mail, Message
+from config import mail_username, mail_password, secret_key
 
 
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////Users/emmamcardle/programming_projects/vegan_blog/blog.db'
 # You can't use the database without a secret key
-app.config['SECRET_KEY'] = 'mysecretkey'
-db = SQLAlchemy(app)
+app.config['SECRET_KEY'] = secret_key
+app.config['MAIL_SERVER'] = "smtp-mail.outlook.com"
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SLS'] = False
+app.config['MAIL_USERNAME'] = mail_username
+app.config['MAIL_PASSWORD'] = mail_password
 
+mail = Mail(app)
+db = SQLAlchemy(app)
 admin = Admin(app)
 
 class Blogpost(db.Model):
@@ -24,8 +33,17 @@ class Blogpost(db.Model):
     content = db.Column(db.Text)
     slug = db.Column(db.String(255))
 
+# Will inherit from ModelView class
+class SecureModelView(ModelView):
+    def is_accessible(self):
+        if "logged_in" in session:
+            return True
+        else:
+            # means your unauthorized
+            abort(403)
+
 #adding a modelview
-admin.add_view(ModelView(Blogpost, db.session))
+admin.add_view(SecureModelView(Blogpost, db.session))
 
 # posts = [
 #     {
@@ -55,6 +73,18 @@ def index():
 @app.route("/about")
 def about():
     return render_template("about.html", title="About Page")
+@app.route("/contact", methods=["GET", "POST"])
+def contact():
+    if request.method == "POST":
+        name = request.form.get('name')
+        email = request.form.get('email')
+        phone = request.form.get('phone')
+        message = request.form.get('message')
+
+        msg = Message(subject=f"Mail from {name}", body=f"Name: {name}\nE-Mail: {email}\nPhone: {phone}\n\n\n{message}", sender=mail_username, recipients=['AntonVego@gmail.com'])
+        mail.send(msg)
+        return render_template("contact.html", success=True)
+    return render_template("contact.html", title="Contact Us")
 
 @app.route("/post/<string:slug>")
 def post(slug):
@@ -65,6 +95,20 @@ def post(slug):
         # Allows you to reise an error
         abort(404)
 
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        if request.form.get("username") == "emma" and request.form.get("password") == "emma@12345":
+            session['logged_in'] = True
+            return redirect('/admin')
+        else:
+            return render_template("login.html", failed=True)
+    return render_template("login.html")
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect('/')
 
 if __name__ == '__main__':
     app.run(debug=True)
