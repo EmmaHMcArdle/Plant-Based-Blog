@@ -1,16 +1,18 @@
-from flask import Flask, render_template, url_for, abort, session, redirect, request
+from flask import Flask, render_template, url_for, abort, session, redirect, request,flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 import sqlalchemy
 from flask_mail import Mail, Message
 from config import mail_username, mail_password, secret_key
+from forms import RegistrationForm, LoginForm
 
 
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////Users/emmamcardle/programming_projects/vegan_blog/blog.db'
-# You can't use the database without a secret key
+# You can't use the database without a secret key 
+# A secret key will protect against modifying cookies and cross-site request forgery attacks
 app.config['SECRET_KEY'] = secret_key
 app.config['MAIL_SERVER'] = "smtp-mail.outlook.com"
 app.config['MAIL_PORT'] = 587
@@ -45,23 +47,6 @@ class SecureModelView(ModelView):
 #adding a modelview
 admin.add_view(SecureModelView(Blogpost, db.session))
 
-# posts = [
-#     {
-#         'author': 'Emma McArdle',
-#         'title': 'Best Plant-Based Ice Cream',
-#         'byline': "I selflessly tried every vegan ice cream to find the best one, so you don't have to.",
-#         'content': "The best brand is by far, Ben & Jerry's. I would honestly just recommend making your own.",
-#         'date_posted': 'December 15, 2020'
-#     },
-#     {
-#         'author': 'Emma McArdle',
-#         'title': 'Best Plant-Based Sweets',
-#         'byline': "I consumed irreversible amounts of sugar, so you don't have to.",
-#         'content': "Sour Scandinavian Swimmers",
-#         'date_posted': 'December 16, 2020'
-#     }
-# ]
-
 @app.route("/")
 @app.route("/home")
 def index():
@@ -95,20 +80,39 @@ def post(slug):
         # Allows you to reise an error
         abort(404)
 
-@app.route("/login", methods=["GET", "POST"])
-def login():
+@app.route("/admin_login", methods=["GET", "POST"])
+def admin_login():
     if request.method == "POST":
         if request.form.get("username") == "emma" and request.form.get("password") == "emma@12345":
             session['logged_in'] = True
             return redirect('/admin')
         else:
-            return render_template("login.html", failed=True)
-    return render_template("login.html")
+            return render_template("admin_login.html", failed=True)
+    return render_template("admin_login.html")
 
-@app.route("/logout")
-def logout():
+@app.route("/admin_logout")
+def admin_logout():
     session.clear()
     return redirect('/')
+
+@app.route('/register', methods=["GET", "POST"])
+def register():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        flash(f'Account created for {form.username.data}!', 'success')
+        return redirect( url_for('index'))
+    return render_template('register.html', title="Registration", form=form)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        if form.email.data == 'admin@blog.com' and form.password.data == 'password':
+            flash('You have been logged in!', 'success')
+            return redirect(url_for('index'))
+        else:
+            flash("Login Unsuccessful. Please check username and password", 'danger')
+    return render_template('login.html', title="Login", form=form)
 
 if __name__ == '__main__':
     app.run(debug=True)
