@@ -1,19 +1,11 @@
-from flask import Flask, render_template, url_for, abort, session, redirect, request,flash
-from flask_sqlalchemy import SQLAlchemy
-from flask_admin import Admin
-from flask_admin.contrib.sqla import ModelView
+from flask import render_template, url_for, abort, session, redirect, request,flash
+from blog import app
+from blog.models import Blogpost, User, Rating
+from blog.forms import RegistrationForm, LoginForm
 import sqlalchemy
 from flask_mail import Mail, Message
-from config import mail_username, mail_password, secret_key
-from forms import RegistrationForm, LoginForm
+from blog.config import mail_username, mail_password
 
-
-app = Flask(__name__)
-
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////Users/emmamcardle/programming_projects/vegan_blog/blog.db'
-# You can't use the database without a secret key 
-# A secret key will protect against modifying cookies and cross-site request forgery attacks
-app.config['SECRET_KEY'] = secret_key
 app.config['MAIL_SERVER'] = "smtp-mail.outlook.com"
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
@@ -22,30 +14,6 @@ app.config['MAIL_USERNAME'] = mail_username
 app.config['MAIL_PASSWORD'] = mail_password
 
 mail = Mail(app)
-db = SQLAlchemy(app)
-admin = Admin(app)
-
-class Blogpost(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    # string of max 50 characters
-    title = db.Column(db.String(50))
-    subtitle = db.Column(db.String(100))
-    author = db.Column(db.String(25))
-    date_posted = db.Column(db.DateTime)
-    content = db.Column(db.Text)
-    slug = db.Column(db.String(255))
-
-# Will inherit from ModelView class
-class SecureModelView(ModelView):
-    def is_accessible(self):
-        if "logged_in" in session:
-            return True
-        else:
-            # means your unauthorized
-            abort(403)
-
-#adding a modelview
-admin.add_view(SecureModelView(Blogpost, db.session))
 
 @app.route("/")
 @app.route("/home")
@@ -113,6 +81,3 @@ def login():
         else:
             flash("Login Unsuccessful. Please check username and password", 'danger')
     return render_template('login.html', title="Login", form=form)
-
-if __name__ == '__main__':
-    app.run(debug=True)
