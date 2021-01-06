@@ -4,3 +4,5 @@ flask_admin
 flask-mail
 flask-wtf
 email_validator
+flask_bcrypt
+flask-login
