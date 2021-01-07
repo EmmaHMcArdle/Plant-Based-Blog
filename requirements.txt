@@ -6,3 +6,4 @@ flask-wtf
 email_validator
 flask_bcrypt
 flask-login
+Pillow

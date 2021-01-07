@@ -1,7 +1,10 @@
+import secrets
+import os
+from PIL import Image
 from flask import render_template, url_for, abort, session, redirect, request, flash
 from blog import app, db, bcrypt
 from blog.models import Blogpost, User, Rating
-from blog.forms import RegistrationForm, LoginForm
+from blog.forms import RegistrationForm, LoginForm, UpdateAccountForm
 import sqlalchemy
 from flask_mail import Mail, Message
 from blog.config import mail_username, mail_password
@@ -101,8 +104,40 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
-@app.route('/account')
+def save_picture(form_picture):
+    #create random hex as to not collide with names of other photos
+    random_hex = secrets.token_hex(8)
+    _, f_ext = os.path.splitext(form_picture.filename)
+    picture_filename = random_hex + f_ext
+    # save within our static folder, app.root_path gives us the whole path
+    picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_filename)
+    # TO DO: maybe let people edit the photo's positioning and not make it look bad if not a square
+    # TO DO: Delete photos that are no longer being used by users when they change
+    output_size = (125, 125)
+    form_picture_resized = Image.open(form_picture)
+    form_picture_resized.thumbnail(output_size)
+    form_picture_resized.save(picture_path)
+
+    return picture_filename
+
+@app.route('/account', methods=['GET', 'POST'])
 # decorator
 @login_required
 def account():
-    return render_template('account.html', title="Account")
+    form = UpdateAccountForm()
+    if form.validate_on_submit():
+        if form.picture.data:
+            picture_file = save_picture(form.picture.data)
+            current_user.image_file = picture_file
+        current_user.username = form.username.data
+        current_user.email = form.email.data
+        db.session.commit()
+        flash('Your account has been updated!', 'success')
+        # Sends a get request rather than another post so there is no form refresh message
+        return redirect(url_for('account'))
+    elif request.method == 'GET':
+        form.username.data = current_user.username
+        form.email.data = current_user.email
+    image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
+    return render_template('account.html', title="Account",
+                          image_file=image_file, form=form)
