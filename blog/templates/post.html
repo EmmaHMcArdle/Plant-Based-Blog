@@ -1,5 +1,9 @@
 {% extends "layout.html" %}
 
+{%block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='scss/stars.css') }} ">
+{% endblock css %}
+
 {% block content %}
     <h1>{{ post.title }}</h1>
 
@@ -22,8 +26,13 @@
                 </div>
             </div>
         </div>
+    
     </article>
-
+    <div class="Stars" style="--rating: 5;" aria-label="Rating of this product is 2.3 out of 5."></div>
 
     
 {% endblock content %}
+
+{% block js %}
+<script src="{{ url_for('static', filename='stars.js') }} "></script>
+{% endblock js %}

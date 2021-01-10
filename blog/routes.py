@@ -6,6 +6,7 @@ from blog import app, db, bcrypt
 from blog.models import Blogpost, User, Rating
 from blog.forms import RegistrationForm, LoginForm, UpdateAccountForm
 import sqlalchemy
+from blog.config import admin_username, admin_pw
 from flask_mail import Mail, Message
 from blog.config import mail_username, mail_password
 from flask_login import login_user, current_user, logout_user, login_required
@@ -55,7 +56,7 @@ def post(slug):
 @app.route("/admin_login", methods=["GET", "POST"])
 def admin_login():
     if request.method == "POST":
-        if request.form.get("username") == "emma" and request.form.get("password") == "emma@12345":
+        if request.form.get("username") == admin_username and request.form.get("password") == admin_pw:
             session['logged_in'] = True
             return redirect('/admin')
         else:
