@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from flask_login import current_user
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, RadioField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from blog.models import User
 
@@ -49,3 +49,6 @@ class UpdateAccountForm(FlaskForm):
             user = User.query.filter_by(email=email.data).first()
             if user:
                 raise ValidationError('This email is already register to another account.')
+
+class StarRatingForm(FlaskForm):
+    stars = RadioField('Star Rating', choices=[('1', 'hated'), ('2', 'disliked'), ('3', 'average'), ('4', 'liked'), ('5', 'loved')])

@@ -34,19 +34,18 @@ class User(db.Model, UserMixin):
     # lazy = True means that sqlalchemy will load the data as neccesary in one go
     # will be able to get all ratings created by a user
     # not a column but an additional query in the background 
-    ratings = db.relationship('Rating', backref='author', lazy=True)
+    ratings = db.relationship('StarRating', backref='author', lazy=True)
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}', '{self.image_file}')"
 
-class Rating(db.Model):
+class StarRating(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     stars = db.Column(db.Integer, nullable=False)
-    review = db.Column(db.String(200))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     def __repr__(self):
-        return f"Rating('{self.stars}', '{self.review}')"
+        return f"Rating('{self.stars}', '{self.id}')"
 
 # Will inherit from ModelView class
 class SecureModelView(ModelView):

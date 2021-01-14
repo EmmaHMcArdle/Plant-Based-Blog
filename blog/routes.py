@@ -3,8 +3,8 @@ import os
 from PIL import Image
 from flask import render_template, url_for, abort, session, redirect, request, flash
 from blog import app, db, bcrypt
-from blog.models import Blogpost, User, Rating
-from blog.forms import RegistrationForm, LoginForm, UpdateAccountForm
+from blog.models import Blogpost, User
+from blog.forms import RegistrationForm, LoginForm, UpdateAccountForm, StarRatingForm
 import sqlalchemy
 from blog.config import admin_username, admin_pw
 from flask_mail import Mail, Message
@@ -44,11 +44,17 @@ def contact():
         return render_template("contact.html", success=True)
     return render_template("contact.html", title="Contact Us")
 
-@app.route("/post/<string:slug>")
+@app.route("/post/<string:slug>", methods=["GET", "POST"])
 def post(slug):
+    form = StarRatingForm()
+    if form.validate_on_submit():
+        # request.form.get("rating")
+        print(form.stars.data)
+    else:
+        print(form.errors)
     try:
         post = Blogpost.query.filter_by(slug=slug).one()
-        return render_template("post.html", post=post)
+        return render_template("post.html", post=post, form=form)
     except sqlalchemy.orm.exc.NoResultFound:
         # Allows you to reise an error
         abort(404)

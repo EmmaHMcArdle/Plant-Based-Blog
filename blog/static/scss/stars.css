@@ -4,20 +4,22 @@
   --star-background: #fc0;
 }
 
-.Stars {
-  --percent: calc(var(--rating) / 5 * 100%);
-  display: inline-block;
-  font-size: var(--star-size);
-  font-family: Times;
-  line-height: 1;
+ul {
+  padding: 0;
+  margin: 0;
 }
 
-.Stars::before {
-  content: attr(data-before);
-  letter-spacing: 3px;
-  background: -webkit-gradient(linear, left top, right top, from(var(--star-background)), to(var(--star-color)));
-  background: linear-gradient(90deg, var(--star-background) var(--percent), var(--star-color) var(--percent));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+ul li {
+  list-style-type: none;
+  display: inline-block;
+}
+
+.stars {
+  color: var(--star-background);
+  font-size: var(--star-size);
+}
+
+input[type="radio"] {
+  display: none;
 }
 /*# sourceMappingURL=stars.css.map */
