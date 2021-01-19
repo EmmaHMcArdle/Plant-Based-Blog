@@ -3,7 +3,7 @@ import os
 from PIL import Image
 from flask import render_template, url_for, abort, session, redirect, request, flash
 from blog import app, db, bcrypt
-from blog.models import Blogpost, User
+from blog.models import Blogpost, User, StarRating
 from blog.forms import RegistrationForm, LoginForm, UpdateAccountForm, StarRatingForm
 import sqlalchemy
 from blog.config import admin_username, admin_pw
@@ -31,6 +31,7 @@ def index():
 @app.route("/about")
 def about():
     return render_template("about.html", title="About Page")
+
 @app.route("/contact", methods=["GET", "POST"])
 def contact():
     if request.method == "POST":
@@ -47,14 +48,17 @@ def contact():
 @app.route("/post/<string:slug>", methods=["GET", "POST"])
 def post(slug):
     form = StarRatingForm()
+    # if StarRating.query.filter_by(author=current_user):
+    # starz = StarRating.query.filter_by(author=current_user)
     if form.validate_on_submit():
-        # request.form.get("rating")
-        print(form.stars.data)
-    else:
-        print(form.errors)
+    # if request.method =="POST" and form.validate():
+        rating = StarRating(stars=form.stars.data, author=current_user)
+        db.session.add(rating)
+        db.session.commit()
+        flash('Added', 'success')
     try:
         post = Blogpost.query.filter_by(slug=slug).one()
-        return render_template("post.html", post=post, form=form)
+        return render_template("post.html", post=post, form=form, title=slug)
     except sqlalchemy.orm.exc.NoResultFound:
         # Allows you to reise an error
         abort(404)

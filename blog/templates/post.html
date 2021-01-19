@@ -29,14 +29,17 @@
     
     </article>
 
-    <form method="POST" action="/">
+    <form method="post" action="#">
+        {{ form.csrf_token }}
         {% for star in form.stars %}
             <tr>
                 <td>{{ star }}</td>
                 <td>{{ star.label(class="stars", id="s" + loop.index|string) }}</td>
             </tr>
         {% endfor %}
-    <input type="submit">
+        <div class="form-group">
+            {{ form.submit(class="btn btn-outline-info")}}
+        </div>
     </form>
     
 {% endblock content %}

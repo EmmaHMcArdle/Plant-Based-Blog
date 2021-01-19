@@ -52,3 +52,4 @@ class UpdateAccountForm(FlaskForm):
 
 class StarRatingForm(FlaskForm):
     stars = RadioField('Star Rating', choices=[('1', 'hated'), ('2', 'disliked'), ('3', 'average'), ('4', 'liked'), ('5', 'loved')])
+    submit = SubmitField('Rate')

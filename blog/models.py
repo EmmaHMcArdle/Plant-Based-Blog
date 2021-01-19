@@ -5,7 +5,6 @@ from flask_admin import Admin
 from flask import abort, session
 from flask_login import UserMixin
 
-
 admin = Admin(app)
 
 # naming convention for extension
@@ -43,7 +42,7 @@ class StarRating(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     stars = db.Column(db.Integer, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-
+    # date_time = db.Column(db.)
     def __repr__(self):
         return f"Rating('{self.stars}', '{self.id}')"
 
