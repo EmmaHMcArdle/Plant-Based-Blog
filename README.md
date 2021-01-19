@@ -5,6 +5,6 @@ SQL-Alchemy,
 Jinja2,
 HTML,
 CSS,
-SCSS
+SCSS,
 JavaScript,
 Bootstrap
