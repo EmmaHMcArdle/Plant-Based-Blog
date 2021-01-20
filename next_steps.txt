@@ -1,0 +1,3 @@
+Make it so only one user can have one rating per page or even product. And render what they rated in the past on the page
+maybe render the same page but with the new stars (pass in stars=stars)
+Continue watching Part 8 of Corey Schafer
